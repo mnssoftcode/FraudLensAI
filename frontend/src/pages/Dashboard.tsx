@@ -11,7 +11,6 @@ import {
 import api from "../api/api";
 
 import Header from "../components/Header";
-import Footer from "../components/Footer";
 import MetricCard from "../components/MetricCard";
 import ComparisonChart from "../components/ComparisonChart";
 import ConfusionMatrix from "../components/ConfusionMatrix";
@@ -160,7 +159,6 @@ export default function Dashboard() {
 
         <PredictionForm />
 
-        <Footer />
       </Container>
     </Box>
   );
