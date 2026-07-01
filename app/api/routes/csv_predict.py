@@ -2,7 +2,7 @@ import joblib
 import pandas as pd
 
 from fastapi import APIRouter, File, UploadFile
-
+from pathlib import Path
 from app.core.config import settings
 
 router = APIRouter(
@@ -12,7 +12,6 @@ router = APIRouter(
 
 model = joblib.load(settings.MODEL_PATH)
 scaler = joblib.load(settings.SCALER_PATH)
-
 
 @router.post("/csv")
 async def predict_csv(file: UploadFile = File(...)):
@@ -32,6 +31,8 @@ async def predict_csv(file: UploadFile = File(...)):
     fraud = int(predictions.sum())
 
     safe = len(df) - fraud
+
+    Path("reports").mkdir(exist_ok=True)
 
     output = "reports/predictions.csv"
 
