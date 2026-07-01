@@ -23,7 +23,7 @@ async def predict_csv(file: UploadFile = File(...)):
 
     predictions = model.predict(X)
 
-    probabilities = model.predict_proba(X)[:, 1]
+    probabilities = model.predict_proba(X)[:,1]
 
     df["Prediction"] = predictions
 
@@ -35,14 +35,29 @@ async def predict_csv(file: UploadFile = File(...)):
 
     output = "reports/predictions.csv"
 
-    df.to_csv(
-        output,
-        index=False,
-    )
+    df.to_csv(output, index=False)
 
     return {
-        "total_transactions": len(df),
-        "fraud_detected": fraud,
-        "safe_transactions": safe,
-        "download": output,
+
+        "summary": {
+
+            "total_transactions": len(df),
+
+            "fraud_detected": fraud,
+
+            "safe_transactions": safe,
+
+            "fraud_rate": round(
+                fraud / len(df) * 100,
+                2,
+            ),
+
+        },
+
+        "predictions": df.to_dict(
+            orient="records"
+        ),
+
+        "download": "/download/predictions",
+
     }
