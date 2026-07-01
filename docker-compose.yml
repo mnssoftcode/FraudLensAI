@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+
+  fraudlens:
+
+    build: .
+
+    container_name: fraudlens-ai
+
+    ports:
+      - "8000:8000"
+
+    restart: unless-stopped

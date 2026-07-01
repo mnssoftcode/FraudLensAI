@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="../static/css/report.css">
+	<title>FraudLens AI - EDA</title>
+</head>
+<body>
+	<h1>FraudLens AI - EDA Report</h1>
+
+	<h2>Overview</h2>
+	<ul>
+		<li>Rows: {{ overview.rows }}</li>
+		<li>Columns: {{ overview.columns }}</li>
+		<li>Missing values: {{ overview.missing_values }}</li>
+		<li>Duplicate rows: {{ overview.duplicate_rows }}</li>
+		<li>Memory (MB): {{ overview.memory_mb }}</li>
+	</ul>
+
+	<h2>Summary</h2>
+	<pre>{{ summary }}</pre>
+</body>
+</html>
