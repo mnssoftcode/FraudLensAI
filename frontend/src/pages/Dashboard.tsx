@@ -23,7 +23,7 @@ export default function Dashboard() {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await api.get("/");
+        const res = await api.get("/metrics");
         setData(res.data);
       } catch (err) {
         console.error(err);

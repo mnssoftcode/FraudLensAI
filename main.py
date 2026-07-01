@@ -10,6 +10,8 @@ from app.api.routes.health import router as health_router
 from app.api.routes.metrics import router as metrics_router
 from app.api.routes.model import router as model_router
 
+
+
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
@@ -29,7 +31,6 @@ app.include_router(download_router)
 app.include_router(model_router)
 app.include_router(metrics_router)
 app.include_router(health_router)
-
 
 @app.get("/")
 def home():

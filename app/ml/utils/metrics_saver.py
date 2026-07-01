@@ -5,22 +5,12 @@ from pathlib import Path
 class MetricsSaver:
 
     @staticmethod
-    def save(metrics):
+    def save(data):
 
-        output = Path("saved_models")
+        save_dir = Path("saved_models")
+        save_dir.mkdir(exist_ok=True)
 
-        output.mkdir(
-            parents=True,
-            exist_ok=True,
-        )
+        path = save_dir / "metrics.json"
 
-        with open(
-            output / "metrics.json",
-            "w",
-        ) as f:
-
-            json.dump(
-                metrics,
-                f,
-                indent=4,
-            )
+        with open(path, "w") as f:
+            json.dump(data, f, indent=4)

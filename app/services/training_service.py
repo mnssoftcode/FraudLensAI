@@ -88,7 +88,12 @@ class TrainingService:
             trained_models[best["model"]]
         )
 
-        MetricsSaver.save(best)
+        dashboard_data = {
+            "comparison": comparison,
+            "best_model": best,
+        }
+
+        MetricsSaver.save(dashboard_data)
 
         Path("saved_models").mkdir(
             exist_ok=True
