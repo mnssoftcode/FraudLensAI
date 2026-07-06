@@ -1,10 +1,10 @@
 import {
     Card,
     CardContent,
-    Grid,
     Paper,
     Typography,
 } from "@mui/material";
+import Grid from "@mui/material/GridLegacy";
 
 interface Props {
     matrix: number[][];
@@ -50,7 +50,8 @@ export default function ConfusionMatrix({ matrix }: Props) {
 
                             <Grid
                                 key={`${rowIndex}-${colIndex}`}
-                                size={{ xs: 6 }}
+                                item
+                                xs={6}
                             >
 
                                 <Paper

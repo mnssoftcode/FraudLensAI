@@ -3,10 +3,10 @@ import {
   Box,
   CircularProgress,
   Container,
-  Grid,
   Typography,
   Paper,
 } from "@mui/material";
+import Grid from "@mui/material/GridLegacy";
 
 import api from "../api/api";
 
@@ -61,28 +61,28 @@ export default function Dashboard() {
         {/* ================= Metrics ================= */}
 
         <Grid container spacing={3} mb={4}>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid xs={12} sm={6} md={3}>
               <MetricCard
                 title="Best Model"
                 value={data.best_model.model}
               />
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid xs={12} sm={6} md={3}>
               <MetricCard
                 title="Accuracy"
                 value={`${(data.best_model.accuracy * 100).toFixed(2)}%`}
               />
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid xs={12} sm={6} md={3}>
               <MetricCard
                 title="F1 Score"
                 value={`${(data.best_model.f1_score * 100).toFixed(2)}%`}
               />
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid xs={12} sm={6} md={3}>
               <MetricCard
                 title="ROC AUC"
                 value={`${(data.best_model.roc_auc * 100).toFixed(2)}%`}
@@ -93,7 +93,7 @@ export default function Dashboard() {
         {/* ================= Charts ================= */}
 
         <Grid container spacing={3} mb={4}>
-          <Grid item xs={12} lg={7}>
+          <Grid xs={12} lg={7}>
             <Paper
               elevation={2}
               sx={{
@@ -116,7 +116,7 @@ export default function Dashboard() {
             </Paper>
           </Grid>
 
-          <Grid item xs={12} lg={5}>
+          <Grid xs={12} lg={5}>
             <Paper
               elevation={2}
               sx={{
