@@ -1,10 +1,11 @@
 import joblib
 import numpy as np
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from app.api.schemas.batch_transaction import BatchTransactionRequest
 from app.api.schemas.transaction import TransactionRequest
+from app.core.config import settings
 from app.utils.logger import logger
 
 router = APIRouter(
@@ -12,15 +13,26 @@ router = APIRouter(
     tags=["Prediction"],
 )
 
-from app.core.config import settings
+model = None
+scaler = None
 
-model = joblib.load(
-    settings.MODEL_PATH
-)
 
-scaler = joblib.load(
-    settings.SCALER_PATH
-)
+def get_model_scaler():
+    global model, scaler
+    if model is None or scaler is None:
+        try:
+            model = joblib.load(settings.MODEL_PATH)
+            scaler = joblib.load(settings.SCALER_PATH)
+        except Exception as exc:
+            logger.error(
+                "Unable to load model or scaler: %s",
+                exc,
+            )
+            raise HTTPException(
+                status_code=500,
+                detail="Model or scaler could not be loaded.",
+            )
+    return model, scaler
 
 
 def prepare_features(transaction: TransactionRequest):
@@ -63,6 +75,8 @@ def predict(request: TransactionRequest):
 
     logger.info("Prediction request received.")
 
+    model, scaler = get_model_scaler()
+
     features = np.array(
         prepare_features(request)
     ).reshape(1, -1)
@@ -93,6 +107,8 @@ def batch_predict(request: BatchTransactionRequest):
     logger.info(
         f"Batch prediction received ({len(request.transactions)} transactions)"
     )
+
+    model, scaler = get_model_scaler()
 
     features = np.array(
         [

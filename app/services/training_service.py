@@ -95,24 +95,6 @@ class TrainingService:
 
         MetricsSaver.save(dashboard_data)
 
-        Path("saved_models").mkdir(
-            exist_ok=True
-        )
-
-        with open(
-            "saved_models/metrics.json",
-            "w",
-        ) as f:
-
-            json.dump(
-                {
-                    "comparison": comparison,
-                    "best_model": best,
-                },
-                f,
-                indent=4,
-            )
-
         logger.info("Training completed.")
 
         return {

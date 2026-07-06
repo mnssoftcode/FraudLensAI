@@ -23,6 +23,7 @@ export default function PredictionForm() {
     const [file, setFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<any>(null);
+    const [error, setError] = useState<string | null>(null);
 
     const analyze = async () => {
 
@@ -32,9 +33,9 @@ export default function PredictionForm() {
         formData.append("file", file);
 
         setLoading(true);
+        setError(null);
 
         try {
-
             const res = await api.post(
                 "/predict/csv",
                 formData,
@@ -46,15 +47,15 @@ export default function PredictionForm() {
             );
 
             setResult(res.data);
-
-        } catch (e) {
-
-            console.error(e);
-
+        } catch (err: any) {
+            setError(
+                err?.response?.data?.detail ||
+                "Unable to process the file. Please check the CSV format."
+            );
+            console.error(err);
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
-
     };
 
     return (
@@ -163,6 +164,12 @@ export default function PredictionForm() {
 
                     )}
 
+                    {error && (
+                        <Alert severity="error" sx={{ mt: 3 }}>
+                            {error}
+                        </Alert>
+                    )}
+
                 </Box>
 
                 <Button
@@ -198,33 +205,29 @@ export default function PredictionForm() {
                             mt={4}
                         >
 
-                            <Alert severity="info">
-
+                                    <Alert severity="info">
                                 Total Transactions :
                                 {" "}
-                                <strong>{result.total_transactions}</strong>
-
+                                <strong>{result.summary.total_transactions}</strong>
                             </Alert>
 
                             <Alert severity="error">
-
                                 Fraud Detected :
                                 {" "}
-                                <strong>{result.fraud_detected}</strong>
-
+                                <strong>{result.summary.fraud_detected}</strong>
                             </Alert>
 
                             <Alert severity="success">
-
                                 Safe Transactions :
                                 {" "}
-                                <strong>{result.safe_transactions}</strong>
-
+                                <strong>{result.summary.safe_transactions}</strong>
                             </Alert>
 
                             <Button
                                 startIcon={<DownloadIcon />}
-                                href="http://127.0.0.1:8000/download"
+                                href={`${api.defaults.baseURL}${result.download}`}
+                                target="_blank"
+                                rel="noreferrer"
                                 variant="outlined"
                             >
                                 Download Prediction Report

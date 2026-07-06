@@ -38,16 +38,43 @@ An AI/ML-powered fraud detection system with explainability features and anomaly
    python -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
-3. Install dependencies:
+3. Install runtime dependencies:
    ```bash
    pip install -r requirements.txt
+   ```
+4. (Optional) Install development dependencies for notebooks, testing, and tooling:
+   ```bash
+   pip install -r requirements-dev.txt
    ```
 
 ### Running the Application
 
+1. Start the backend:
+
 ```bash
-python main.py
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
+
+2. Start the frontend:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+If the frontend and backend are served from different origins, add a `frontend/.env` file with:
+
+```env
+VITE_API_BASE_URL=http://127.0.0.1:8000
+```
+
+For Railway deployment, the production URLs are:
+
+- Frontend: `http://fraudlens-frontend-production.up.railway.app/`
+- Backend: `https://fraudlensai-production.up.railway.app/`
+
+The frontend is configured to use the backend at `https://fraudlensai-production.up.railway.app` by default when no `VITE_API_BASE_URL` is provided.
 
 ## License
 

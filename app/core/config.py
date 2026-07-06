@@ -9,6 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 class Settings:
+    BASE_DIR = BASE_DIR
 
     APP_NAME = os.getenv(
         "APP_NAME",
