@@ -12,11 +12,15 @@ router = APIRouter(
 
 model = None
 scaler = None
-FEATURE_COLUMNS = [
+
+# Required feature columns (excluding Class label)
+REQUIRED_COLUMNS = [
     column
     for column in EXPECTED_COLUMNS
-    if column not in ("Time", "Class")
+    if column not in ("Class",)
 ]
+# Time is optional — many public CSV samples don't include it
+OPTIONAL_COLUMNS = {"Time"}
 
 
 def get_model_scaler():
@@ -33,18 +37,29 @@ def get_model_scaler():
     return model, scaler
 
 
-def validate_csv_columns(df: pd.DataFrame) -> pd.DataFrame:
-    missing_columns = [
-        column
-        for column in FEATURE_COLUMNS
-        if column not in df.columns
-    ]
+def validate_and_prepare_csv(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Validate CSV columns and fill optional ones with defaults.
+    - Time is optional: defaults to 0.0 if not present
+    - All V1-V28 and Amount are required
+    """
+    # Auto-fill optional missing columns with defaults
+    for col in OPTIONAL_COLUMNS:
+        if col not in df.columns:
+            df[col] = 0.0
+
+    # Check for truly required columns (V1-V28, Amount)
+    strictly_required = [c for c in REQUIRED_COLUMNS if c not in OPTIONAL_COLUMNS]
+    missing_columns = [c for c in strictly_required if c not in df.columns]
     if missing_columns:
         raise HTTPException(
             status_code=400,
-            detail=f"Missing columns: {missing_columns}",
+            detail=f"Missing required columns: {missing_columns}. Expected: V1–V28, Amount (Time is optional).",
         )
-    return df[FEATURE_COLUMNS]
+
+    # Return columns in the exact order the scaler expects
+    return df[REQUIRED_COLUMNS]
+
 
 @router.post("/csv")
 async def predict_csv(file: UploadFile = File(...)):
@@ -63,19 +78,21 @@ async def predict_csv(file: UploadFile = File(...)):
             detail="Uploaded CSV is empty.",
         )
 
-    df = validate_csv_columns(df)
+    df = validate_and_prepare_csv(df)
     model, scaler = get_model_scaler()
 
-    X = scaler.transform(df)
+    # Use named DataFrame so scaler recognizes columns (no sklearn warning)
+    X = df[list(scaler.feature_names_in_)]
+    X_scaled = scaler.transform(X)
 
-    predictions = model.predict(X)
-    probabilities = model.predict_proba(X)[:, 1]
+    predictions = model.predict(X_scaled)
+    probabilities = model.predict_proba(X_scaled)[:, 1]
 
     df["Prediction"] = predictions
-    df["Fraud Probability"] = probabilities
+    df["Label"] = ["Fraud" if p == 1 else "Normal" for p in predictions]
+    df["Fraud Probability"] = probabilities.round(4)
 
     fraud = int(predictions.sum())
-
     safe = len(df) - fraud
 
     output_dir = settings.BASE_DIR / "reports"

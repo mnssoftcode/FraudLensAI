@@ -1,5 +1,7 @@
+# pyrefly: ignore [missing-import]
 import joblib
 import numpy as np
+import pandas as pd
 
 from fastapi import APIRouter, HTTPException
 
@@ -36,8 +38,9 @@ def get_model_scaler():
 
 
 def prepare_features(transaction: TransactionRequest):
-
+    # Order must match scaler training: Time, V1-V28, Amount (30 features)
     return [
+        transaction.Time,
         transaction.V1,
         transaction.V2,
         transaction.V3,
@@ -77,9 +80,11 @@ def predict(request: TransactionRequest):
 
     model, scaler = get_model_scaler()
 
-    features = np.array(
-        prepare_features(request)
-    ).reshape(1, -1)
+    FEATURE_COLS = list(scaler.feature_names_in_)
+    features = pd.DataFrame(
+        [prepare_features(request)],
+        columns=FEATURE_COLS,
+    )
 
     features = scaler.transform(features)
 
@@ -110,11 +115,10 @@ def batch_predict(request: BatchTransactionRequest):
 
     model, scaler = get_model_scaler()
 
-    features = np.array(
-        [
-            prepare_features(t)
-            for t in request.transactions
-        ]
+    FEATURE_COLS = list(scaler.feature_names_in_)
+    features = pd.DataFrame(
+        [prepare_features(t) for t in request.transactions],
+        columns=FEATURE_COLS,
     )
 
     features = scaler.transform(features)

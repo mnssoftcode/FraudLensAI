@@ -1,7 +1,7 @@
 import {
+    Box,
     Card,
     CardContent,
-    Paper,
     Typography,
 } from "@mui/material";
 import Grid from "@mui/material/GridLegacy";
@@ -10,83 +10,82 @@ interface Props {
     matrix: number[][];
 }
 
+const CELLS = [
+    { label: "True Normal",    bg: "#ECFDF5", border: "#6EE7B7", text: "#065F46" },
+    { label: "False Positive", bg: "#FFF7ED", border: "#FCD34D", text: "#92400E" },
+    { label: "False Negative", bg: "#FFF7ED", border: "#FCD34D", text: "#92400E" },
+    { label: "True Fraud",     bg: "#EFF6FF", border: "#93C5FD", text: "#1E40AF" },
+];
+
 export default function ConfusionMatrix({ matrix }: Props) {
 
-    const labels = [
-        ["True Normal", "False Positive"],
-        ["False Negative", "True Fraud"],
-    ];
-
-    const colors = [
-        ["#E8F5E9", "#FFF3E0"],
-        ["#FFF8E1", "#E3F2FD"],
-    ];
+    const flat = matrix.flat();
 
     return (
 
         <Card
             elevation={0}
             sx={{
-                borderRadius: 4,
-                border: "1px solid #E5E7EB",
+                borderRadius: 2,
+                border: "1px solid #E2E5EF",
                 height: "100%",
             }}
         >
 
-            <CardContent>
+            <CardContent sx={{ p: "20px !important" }}>
 
                 <Typography
                     variant="h6"
                     fontWeight={700}
-                    mb={3}
+                    mb={2.5}
+                    sx={{ color: "#111827" }}
                 >
                     Confusion Matrix
                 </Typography>
 
-                <Grid container spacing={2}>
+                <Grid container spacing={1.5}>
 
-                    {matrix.map((row, rowIndex) =>
-                        row.map((value, colIndex) => (
+                    {flat.map((value, i) => (
 
-                            <Grid
-                                key={`${rowIndex}-${colIndex}`}
-                                item
-                                xs={6}
+                        <Grid item xs={6} key={i}>
+
+                            <Box
+                                sx={{
+                                    background: CELLS[i].bg,
+                                    border: `1.5px solid ${CELLS[i].border}`,
+                                    borderRadius: 1.5,
+                                    p: "14px 16px",
+                                    textAlign: "center",
+                                }}
                             >
 
-                                <Paper
-                                    elevation={0}
+                                <Typography
+                                    variant="caption"
                                     sx={{
-                                        background:
-                                            colors[rowIndex][colIndex],
-                                        borderRadius: 3,
-                                        p: 3,
-                                        textAlign: "center",
-                                        border: "1px solid #E5E7EB",
+                                        color: CELLS[i].text,
+                                        fontWeight: 600,
+                                        textTransform: "uppercase",
+                                        letterSpacing: "0.05em",
+                                        fontSize: "0.67rem",
                                     }}
                                 >
+                                    {CELLS[i].label}
+                                </Typography>
 
-                                    <Typography
-                                        variant="body2"
-                                        color="text.secondary"
-                                    >
-                                        {labels[rowIndex][colIndex]}
-                                    </Typography>
+                                <Typography
+                                    variant="h5"
+                                    fontWeight={700}
+                                    mt={0.5}
+                                    sx={{ color: CELLS[i].text }}
+                                >
+                                    {value.toLocaleString()}
+                                </Typography>
 
-                                    <Typography
-                                        variant="h4"
-                                        fontWeight="bold"
-                                        mt={2}
-                                    >
-                                        {value}
-                                    </Typography>
+                            </Box>
 
-                                </Paper>
+                        </Grid>
 
-                            </Grid>
-
-                        ))
-                    )}
+                    ))}
 
                 </Grid>
 

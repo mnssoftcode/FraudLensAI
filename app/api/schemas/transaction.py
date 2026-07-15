@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 class TransactionRequest(BaseModel):
 
+    Time: float = 0.0  # seconds elapsed since first transaction (optional, defaults to 0)
     V1: float
     V2: float
     V3: float
